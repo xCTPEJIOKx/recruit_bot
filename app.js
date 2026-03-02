@@ -37,15 +37,31 @@ async function loadVacancies() {
         const API_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:8000/vacancies'
             : 'https://recruit-test.loca.lt/vacancies';
+        
+        console.log('Загрузка вакансий с:', API_URL);
             
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
+        console.log('Получено вакансий:', data.vacancies ? data.vacancies.length : 0);
         vacancies = data.vacancies || [];
 
         renderVacancies();
     } catch (error) {
         console.error('Ошибка загрузки вакансий:', error);
-        tg.showAlert('Ошибка загрузки вакансий: ' + error.message);
+        console.error('URL:', API_URL);
+        console.error('Response status:', error.status);
+        tg.showAlert('Ошибка загрузки вакансий: ' + error.message + '. Проверьте консоль (F12)');
     }
 }
 
