@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Аналитика - Recruitment System{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800">📈 Аналитика</h1>
+    <p class="text-gray-600 mt-1">Конверсия и статистика рекрутинга</p>
+</div>
+
+<!-- KPI карточки -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm text-gray-500">Всего кандидатов</p>
+        <p class="text-3xl font-bold text-gray-800 mt-2">{{ total_candidates }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm text-gray-500">Конверсия в контакт</p>
+        <p class="text-3xl font-bold text-green-600 mt-2">{{ conversion_rates.new_to_contacted }}%</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm text-gray-500">Конверсия в собеседование</p>
+        <p class="text-3xl font-bold text-blue-600 mt-2">{{ conversion_rates.qualified_to_interview }}%</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6">
+        <p class="text-sm text-gray-500">Конверсия в найм</p>
+        <p class="text-3xl font-bold text-purple-600 mt-2">{{ conversion_rates.interview_to_hired }}%</p>
+    </div>
+</div>
+
+<!-- Графики -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Активность по дням -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">
+            <i class="fas fa-chart-bar text-blue-500"></i>
+            Активность по дням
+        </h2>
+        <canvas id="dailyChart" height="200"></canvas>
+    </div>
+    
+    <!-- Источники кандидатов -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">
+            <i class="fas fa-chart-pie text-orange-500"></i>
+            Источники кандидатов
+        </h2>
+        <canvas id="sourceChart" height="200"></canvas>
+    </div>
+</div>
+
+<!-- Воронка -->
+<div class="bg-white rounded-xl shadow p-6 mb-8">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">
+        <i class="fas fa-filter text-purple-500"></i>
+        Воронка конверсии
+    </h2>
+    
+    <div class="flex items-center justify-center space-x-4 overflow-x-auto">
+        {% set status_emoji = {'new': '🆕', 'contacted': '📞', 'qualified': '✅', 'interview': '📅', 'offer': '📋', 'hired': '🎉'} %}
+        {% set status_names = {'new': 'Новые', 'contacted': 'Связались', 'qualified': 'Квалифицированы', 'interview': 'Собеседование', 'offer': 'Предложение', 'hired': 'Приняты'} %}
+        {% set statuses = ['new', 'contacted', 'qualified', 'interview', 'offer', 'hired'] %}
+        
+        {% for status in statuses %}
+        <div class="text-center">
+            <div class="text-4xl mb-2">{{ status_emoji.get(status, '❓') }}</div>
+            <div class="text-sm text-gray-600">{{ status_names.get(status, status) }}</div>
+            <div class="text-2xl font-bold text-gray-800 mt-1">{{ status_stats.get(status, 0) }}</div>
+        </div>
+        {% if not loop.last %}
+        <div class="text-gray-300 text-2xl">
+            <i class="fas fa-arrow-right"></i>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    
+    <div class="mt-6 pt-6 border-t">
+        <h3 class="text-sm font-semibold text-gray-700 mb-3">Конверсия между этапами:</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="text-center p-3 bg-green-50 rounded-lg">
+                <p class="text-xs text-gray-500">Новые → Связались</p>
+                <p class="text-lg font-bold text-green-600">{{ conversion_rates.new_to_contacted }}%</p>
+            </div>
+            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                <p class="text-xs text-gray-500">Связались → Квалифицированы</p>
+                <p class="text-lg font-bold text-blue-600">{{ conversion_rates.contacted_to_qualified }}%</p>
+            </div>
+            <div class="text-center p-3 bg-purple-50 rounded-lg">
+                <p class="text-xs text-gray-500">Квалифицированы → Собеседование</p>
+                <p class="text-lg font-bold text-purple-600">{{ conversion_rates.qualified_to_interview }}%</p>
+            </div>
+            <div class="text-center p-3 bg-indigo-50 rounded-lg">
+                <p class="text-xs text-gray-500">Собеседование → Offer</p>
+                <p class="text-lg font-bold text-indigo-600">{{ conversion_rates.interview_to_offer if conversion_rates.interview_to_offer else 0 }}%</p>
+            </div>
+            <div class="text-center p-3 bg-emerald-50 rounded-lg">
+                <p class="text-xs text-gray-500">Offer → Приняты</p>
+                <p class="text-lg font-bold text-emerald-600">{{ conversion_rates.interview_to_hired }}%</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Статистика по источникам -->
+<div class="bg-white rounded-xl shadow p-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">
+        <i class="fas fa-table text-gray-500"></i>
+        Детальная статистика
+    </h2>
+    
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Источник</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Кандидатов</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">% от общего</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+            {% for source, count in source_stats.items() %}
+            <tr>
+                <td class="px-6 py-4">
+                    <div class="flex items-center">
+                        {% if source == 'telegram' %}
+                            <i class="fab fa-telegram text-blue-500 text-xl mr-3"></i>
+                        {% elif source == 'avito' %}
+                            <i class="fas fa-bullhorn text-red-500 text-xl mr-3"></i>
+                        {% elif source == 'voice' %}
+                            <i class="fas fa-phone text-green-500 text-xl mr-3"></i>
+                        {% else %}
+                            <i class="fas fa-globe text-gray-500 text-xl mr-3"></i>
+                        {% endif %}
+                        <span class="capitalize font-medium">{{ source }}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-gray-900">{{ count }}</td>
+                <td class="px-6 py-4">
+                    <div class="flex items-center">
+                        <div class="flex-1 bg-gray-200 rounded-full h-2 mr-3">
+                            <div class="bg-blue-500 h-2 rounded-full" 
+                                 style="width: {{ (count / total_candidates * 100) if total_candidates else 0 }}%"></div>
+                        </div>
+                        <span class="text-sm font-medium">{{ "%.1f"|format((count / total_candidates * 100) if total_candidates else 0) }}%</span>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// График активности по дням
+const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+new Chart(dailyCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for day, count in daily_stats %}'{{ day }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Кандидатов',
+            data: [{% for day, count in daily_stats %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+            borderColor: 'rgb(59, 130, 246)',
+            borderWidth: 2,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+});
+
+// График источников
+const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+new Chart(sourceCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for source, count in source_stats.items() %}'{{ source }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for source, count in source_stats.items() %}{{ count }}{% if not loop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: [
+                'rgb(59, 130, 246)',  // Telegram - blue
+                'rgb(239, 68, 68)',   // Avito - red
+                'rgb(34, 197, 94)',   // Voice - green
+                'rgb(156, 163, 175)'  // Other - gray
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+</script>
+{% endblock %}
