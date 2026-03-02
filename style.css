@@ -176,13 +176,14 @@ body {
 
 /* Заголовок с градиентом */
 .title-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     font-weight: 700;
     font-size: 28px;
-    text-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 /* Карточка квалификации */
