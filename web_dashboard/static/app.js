@@ -31,15 +31,16 @@ async function loadVacancies() {
     showLoading();
 
     try {
-        // Загружаем вакансии из API Web Dashboard
-        const response = await fetch('/api/vacancies');
+        // Загружаем вакансии из API через localtunnel
+        const API_URL = 'https://tiny-toys-tickle.loca.lt/api/vacancies';
+        const response = await fetch(API_URL);
         const data = await response.json();
         vacancies = data.vacancies || [];
 
         renderVacancies();
     } catch (error) {
         console.error('Ошибка загрузки вакансий:', error);
-        tg.showAlert('Ошибка загрузки вакансий');
+        tg.showAlert('Ошибка загрузки вакансий: ' + error.message);
     }
 }
 
