@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Контакты - Recruitment System{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-address-book text-blue-500 mr-3"></i>
+            Контакты
+        </h1>
+        <p class="text-gray-600">Свяжитесь с нами по любым вопросам</p>
+    </div>
+
+    <!-- Company Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Отдел кадров -->
+        {% for contact in contacts %}
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                        {{ contact.name[0] }}
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-800">{{ contact.name }}</h3>
+                        <p class="text-sm text-blue-600">{{ contact.role }}</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <i class="fas fa-circle text-xs mr-1"></i>
+                    Онлайн
+                </span>
+            </div>
+
+            <div class="space-y-3">
+                <a href="tel:{{ contact.phone }}" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 group-hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-phone text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Телефон</p>
+                        <p class="text-gray-800 font-medium">{{ contact.phone }}</p>
+                    </div>
+                </a>
+
+                <a href="mailto:{{ contact.email }}" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3 group-hover:bg-purple-200 transition-colors">
+                        <i class="fas fa-envelope text-purple-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">Email</p>
+                        <p class="text-gray-800 font-medium">{{ contact.email }}</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">
+            <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+            Быстрые действия
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="tel:+7999123456" class="flex items-center justify-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors group">
+                <i class="fas fa-phone-alt text-green-600 mr-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-green-700 font-medium">Позвонить</span>
+            </a>
+            <a href="mailto:hr@company.com" class="flex items-center justify-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group">
+                <i class="fas fa-envelope text-blue-600 mr-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-blue-700 font-medium">Написать письмо</span>
+            </a>
+            <a href="/candidates" class="flex items-center justify-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors group">
+                <i class="fas fa-users text-purple-600 mr-2 group-hover:scale-110 transition-transform"></i>
+                <span class="text-purple-700 font-medium">Кандидаты</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Working Hours -->
+    <div class="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+        <h3 class="text-lg font-semibold mb-3">
+            <i class="fas fa-clock mr-2"></i>
+            Режим работы
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-blue-100 text-sm mb-1">Понедельник - Пятница</p>
+                <p class="font-semibold">9:00 - 18:00 (МСК)</p>
+            </div>
+            <div>
+                <p class="text-blue-100 text-sm mb-1">Суббота - Воскресенье</p>
+                <p class="font-semibold">Выходной</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Info -->
+    <div class="mt-6 bg-gray-50 rounded-xl p-6 border border-gray-200">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-500 text-2xl"></i>
+            </div>
+            <div class="ml-4">
+                <h4 class="text-lg font-semibold text-gray-800 mb-2">Техническая поддержка</h4>
+                <p class="text-gray-600 mb-3">
+                    По техническим вопросам обращайтесь в службу поддержки
+                </p>
+                <a href="mailto:support@company.com" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium">
+                    <i class="fas fa-envelope mr-2"></i>
+                    support@company.com
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
