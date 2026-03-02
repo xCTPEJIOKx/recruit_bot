@@ -32,11 +32,11 @@ async function loadVacancies() {
 
     try {
         // Загружаем вакансии из API
-        // Для GitHub Pages + public API используйте: https://your-url.com/api/vacancies
-        // Для локальной разработки: /api/vacancies (через proxy) или http://localhost:8080/api/vacancies
+        // Для GitHub Pages + public API используйте публичный URL
+        // Для локальной разработки: http://localhost:8000/vacancies
         const API_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8080/api/vacancies'
-            : '/api/vacancies';
+            ? 'http://localhost:8000/vacancies'
+            : 'https://recruit-test.loca.lt/vacancies';
             
         const response = await fetch(API_URL);
         const data = await response.json();
@@ -252,8 +252,8 @@ async function submitApplication() {
     try {
         // Отправка данных на API
         const API_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:8080/api/candidates'
-            : '/api/candidates';
+            ? 'http://localhost:8000/candidates'
+            : 'https://recruit-test.loca.lt/candidates';
         
         const response = await fetch(API_URL, {
             method: 'POST',
