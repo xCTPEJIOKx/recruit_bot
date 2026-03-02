@@ -1,42 +1,41 @@
-# 🤖 Recruitment Agents System
+# 🤖 Recruitment System
 
-Автоматизированная система рекрутинга из 4 агентов с нулевым бюджетом.
+Автоматизированная система рекрутинга с Web App для Telegram.
 
 ## 📋 Архитектура
 
 ```
-                    ┌─────────────────┐
-                    │  Orchestrator   │
-                    │  (API + Dashboard)│
-                    │  Port: 8000     │
-                    └────────┬────────┘
+┌─────────────────┐     ┌─────────────────┐
+│  Telegram Bot   │────▶│   Web App       │
+│  @Recruit2026   │     │  (GitHub Pages) │
+└─────────────────┘     └────────┬────────┘
+                                 │
+                                 ▼
+                    ┌─────────────────────────┐
+                    │   Localtunnel/ngrok     │
+                    │   (публичный API)       │
+                    └────────┬────────────────┘
                              │
-         ┌───────────────────┼───────────────────┐
-         │                   │                   │
-         ▼                   ▼                   ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│  Avito Agent    │ │  Voice Agent    │ │  Telegram Bot   │
-│  (Публикация +  │ │  (Звонки)       │ │  (Квалификация) │
-│   отклики)      │ │  (Voximplant)   │ │  (Aiogram)      │
-└─────────────────┘ └─────────────────┘ └─────────────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Classifieds     │
-                    │ Agent           │
-                    │ (Доски)         │
-                    └─────────────────┘
+        ┌────────────────────┼────────────────────┐
+        │                    ▼                    │
+        │  ┌──────────────────────────┐          │
+        └─▶│  Orchestrator (API)      │◀─────────┘
+           │  Port: 8000              │
+           │  - REST API              │
+           │  - Web App (static)      │
+           └───────────┬──────────────┘
+                       │
+           ┌───────────┼──────────────┐
+           ▼           ▼              ▼
+    ┌──────────┐ ┌──────────┐ ┌──────────┐
+    │Database  │ │Telegram  │ │ Voice    │
+    │SQLite    │ │Bot       │ │ Agent    │
+    └──────────┘ └──────────┘ └──────────┘
 ```
 
 ## 🚀 Быстрый старт
 
-### 1. Требования
-
-- Python 3.10+
-- Telegram Bot Token (@BotFather)
-- Avito аккаунт (для браузерной автоматизации)
-
-### 2. Установка
+### 1. Установка зависимостей
 
 ```bash
 cd /home/hp/recruitment_agents
@@ -47,168 +46,89 @@ source venv/bin/activate
 
 # Зависимости
 pip install -r requirements.txt
-
-# Playwright браузеры
-playwright install chromium
 ```
 
-### 3. Настройка
+### 2. Настройка
 
 ```bash
 # Копирование .env
 cp .env.example .env
 
-# Редактирование
+# Редактирование .env
 nano .env
 ```
 
 **Обязательные переменные:**
 ```bash
 # Telegram Bot
-TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_ADMIN_CHAT_ID=your_chat_id  # Запустите: python scripts/get_chat_id.py
 
-# Avito (браузерная автоматизация)
-AVITO_LOGIN=+79990000000
-AVITO_PASSWORD=your_password
-
-# База данных
+# Database
 DATABASE_PATH=./data/recruitment.db
 ```
 
-### 4. Запуск
+### 3. Инициализация БД
 
 ```bash
-# Инициализация БД
 python -m common.init_db
+```
 
-# Создание вакансий
-python scripts/create_vacancies.py
+### 4. Запуск системы
 
-# Запуск всех агентов
+```bash
 python run.py
 ```
 
-### Запуск через Docker
+**После запуска:**
+- API: http://localhost:8000
+- Web App: http://localhost:8000/static/index.html
+- Dashboard: http://localhost:8000/candidates
 
+### 5. Публикация Web App
+
+**Вариант A: Localtunnel (быстро)**
 ```bash
-docker-compose up -d
+lt --port 8080
+# Скопируйте URL и обновите app.js
 ```
+
+**Вариант B: GitHub Pages**
+1. Обновите `app.js` с публичным API URL
+2. Закоммитьте файлы
+3. GitHub Pages автоматически опубликует
+
+### 6. Настройка Telegram бота
+
+1. @BotFather → `/mybots` → Recruit2026_bot
+2. Bot Settings → Menu Button
+3. Configure Menu Button
+4. URL: `https://your-username.github.io/recruit_bot/index.html`
 
 ## 📁 Структура проекта
 
 ```
 recruitment_agents/
 ├── common/                 # Общие модули
-│   ├── config.py          # Настройки (pydantic)
-│   ├── database.py        # Асинхронная БД (aiosqlite)
-│   ├── models.py          # Модели данных
+│   ├── config.py          # Настройки
+│   ├── database.py        # База данных
+│   ├── models.py          # Модели
 │   └── init_db.py         # Инициализация БД
-├── avito_agent/           # Avito агент
-│   ├── agent.py           # Avito API
-│   └── avito_browser_agent.py  # Браузерный агент
 ├── telegram_bot/          # Telegram бот
 │   └── bot.py            # Aiogram бот
 ├── voice_agent/           # Voice агент
-│   └── voice_agent.py    # Voximplant/Twilio
-├── classifieds_agent/     # Доски объявлений
-│   └── agent.py          # Мультиплатформенный постинг
-├── orchestrator/          # Координатор
-│   └── orchestrator.py   # FastAPI + Dashboard
-├── web_dashboard/         # Веб-интерфейс
-│   ├── app.py            # Dashboard API
-│   ├── templates/        # Jinja2 шаблоны
-│   └── static/           # Статика (Telegram Web App)
+│   └── voice_agent.py    # Голосовые звонки
+├── orchestrator/          # API + Web App
+│   └── orchestrator.py   # FastAPI
+├── web_dashboard/         # Web App
+│   └── static/           # HTML/CSS/JS
 ├── scripts/               # Скрипты
-│   ├── create_vacancies.py
-│   ├── create_tunnel.py   # Cloudflare туннель
-│   └── avito_oauth.py     # OAuth для Avito
-├── docs/                  # Документация
+│   ├── run_web.py        # Запуск Web App
+│   ├── get_chat_id.py    # Получение chat_id
+│   └── create_vacancies.py
 ├── data/                  # База данных
-├── run.py                 # Запуск всех агентов
-├── requirements.txt       # Зависимости
-└── .env                   # Конфигурация
-```
-
-## 🤖 Агенты
-
-### Avito Agent
-
-**Функционал:**
-- Публикация вакансий на Avito
-- Мониторинг откликов (каждую минуту)
-- Отправка приглашений в Telegram бот
-- Сохранение кандидатов в БД
-
-**Режимы работы:**
-1. **API** — через Avito OAuth API (требуются токены)
-2. **Browser** — браузерная автоматизация (Playwright)
-
-**Запуск:**
-```bash
-python -m avito_agent.avito_browser_agent
-```
-
-### Telegram Bot
-
-**Команды:**
-- `/start` — Начало работы
-- `/status` — Статус заявки
-- `/vacancies` — Список вакансий
-
-**Воронка квалификации:**
-1. Имя → 2. Телефон → 3. Опыт → 4. График → 5. Зарплата
-
-**Запуск:**
-```bash
-python -m telegram_bot.bot
-```
-
-### Voice Agent
-
-**Интеграции:**
-- Voximplant (основная)
-- Twilio (альтернатива)
-
-**Сценарии:**
-- Исходящие звонки кандидатам
-- Квалификация через голосовой диалог
-- Назначение собеседований
-
-**Запуск:**
-```bash
-python -m voice_agent.voice_agent
-```
-
-### Classifieds Agent
-
-**Площадки:**
-- Avito, Cian, DomClick, Auto.ru и др.
-
-**Функционал:**
-- Автоматический постинг вакансий
-- Мультиплатформенная публикация
-
-**Запуск:**
-```bash
-python -m classifieds_agent.agent
-```
-
-### Orchestrator
-
-**API Endpoints:**
-
-| Endpoint | Описание |
-|----------|----------|
-| `GET /` | Информация о сервисе |
-| `GET /health` | Проверка здоровья |
-| `GET /status` | Статус всех агентов |
-| `GET /dashboard` | Веб-дашборд |
-| `GET /candidates` | Список кандидатов |
-| `GET /vacancies` | Список вакансий |
-
-**Запуск:**
-```bash
-python -m orchestrator.orchestrator
+├── run.py                 # Запуск системы
+└── requirements.txt       # Зависимости
 ```
 
 ## 📊 Воронка рекрутинга
@@ -217,109 +137,61 @@ python -m orchestrator.orchestrator
 🆕 Новый → 📞 Связались → ✅ Квалифицирован → 📅 Собеседование → 📋 Offer → 🎉 Принят
 ```
 
-**Статусы кандидатов:**
-- `new` — Новый отклик
-- `contacted` — Связались
-- `qualified` — Квалифицирован
-- `interview` — Назначено собеседование
-- `offer` — Предложение сделано
-- `hired` — Принят
-- `rejected` — Отказ
+## 🔧 API Endpoints
 
-## 🔧 Конфигурация
+| Endpoint | Описание |
+|----------|----------|
+| `GET /health` | Проверка здоровья |
+| `GET /vacancies` | Список вакансий |
+| `POST /vacancies` | Создание вакансии |
+| `GET /candidates` | Список кандидатов |
+| `POST /candidates` | Создание кандидата |
+| `PUT /candidates/{id}/status` | Обновление статуса |
 
-### Переменные окружения (.env)
+## 📱 Web App
 
+Web App открывается в Telegram и позволяет:
+- Просматривать вакансии
+- Заполнять форму отклика (5 шагов)
+- Отправлять данные кандидата
+
+**После отклика:**
+- Данные сохраняются в базу
+- Telegram уведомление отправляется администратору
+- Voice Agent может позвонить кандидату
+
+## 🛠️ Скрипты
+
+### Получить chat_id Telegram
 ```bash
-# Telegram Bot (обязательно)
-TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
+python scripts/get_chat_id.py
+```
 
-# Avito (для браузерной автоматизации)
-AVITO_LOGIN=+79990000000
-AVITO_PASSWORD=your_password
+### Создать тестовые вакансии
+```bash
+python scripts/create_vacancies.py
+```
 
-# Avito API (опционально)
-AVITO_CLIENT_ID=your_client_id
-AVITO_CLIENT_SECRET=your_client_secret
-AVITO_ACCESS_TOKEN=your_access_token
-AVITO_REFRESH_TOKEN=your_refresh_token
-
-# Telephony - Voximplant
-VOXIMPLANT_ACCOUNT_ID=54675
-VOXIMPLANT_API_KEY=your_api_key
-VOXIMPLANT_PHONE_NUMBER=+79990000000
-
-# База данных
-DATABASE_PATH=./data/recruitment.db
-
-# Orchestrator
-ORCHESTRATOR_HOST=0.0.0.0
-ORCHESTRATOR_PORT=8000
-
-# Web App URL (для Telegram)
-WEBAPP_URL=https://your-domain.com
-
-# Логирование
-LOG_LEVEL=INFO
-DEBUG=false
+### Запустить Web Dashboard
+```bash
+python scripts/run_web.py
 ```
 
 ## 📈 Мониторинг
 
 ### Проверка статуса
-
 ```bash
-# Через API
+curl http://localhost:8000/health
 curl http://localhost:8000/status
-
-# Dashboard
-curl http://localhost:8000/dashboard
-
-# Кандидаты с Avito
-curl http://localhost:8000/candidates?source=avito
+curl http://localhost:8000/stats
 ```
 
 ### Логи
-
 ```bash
-# Orchestrator
-tail -f /tmp/orchestrator.log
-
-# Avito Agent
-tail -f /tmp/avito_browser.log
-
-# Telegram Bot
-tail -f /tmp/telegram_bot.log
+tail -f /tmp/orch.log    # Orchestrator
+tail -f /tmp/tg.log      # Telegram Bot
+tail -f /tmp/voice.log   # Voice Agent
 ```
-
-## 🚨 Troubleshooting
-
-### Бот не отвечает
-
-1. Проверьте токен в `.env`
-2. Убедитесь, что бот запущен: `curl http://localhost:8000/status`
-3. Проверьте логи: `tail -f /tmp/telegram_bot.log`
-
-### Avito показывает капчу
-
-**Решение:**
-1. Войти в Avito через браузер
-2. Импортировать cookies: `python scripts/avito_oauth.py`
-3. Или использовать OAuth API
-
-### Ошибка базы данных
-
-```bash
-# Переинициализация БД
-rm data/recruitment.db
-python -m common.init_db
-```
-
-## 📝 Документация
-
-- `docs/AVITO_SETUP.md` — Настройка Avito
-- `docs/WEBAPP.md` — Telegram Web App
-- `docs/CLASSIFIEDS_AGENT.md` — Доски объявлений
 
 ## 🔐 Безопасность
 
@@ -330,7 +202,3 @@ python -m common.init_db
 ## 📄 Лицензия
 
 MIT
-
----
-
-**Сделано с ❤️ для автоматизации рекрутинга**

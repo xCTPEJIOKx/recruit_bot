@@ -4,27 +4,12 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
 *.pyc
 
 # Virtual environments
 venv/
 env/
-ENV/
 .venv
 
 # IDE
@@ -32,7 +17,6 @@ ENV/
 .vscode/
 *.swp
 *.swo
-*~
 
 # Environment
 .env
@@ -48,38 +32,20 @@ data/*.db-journal
 # Logs
 *.log
 logs/
+tmp/
 /tmp/
 
 # OS
 .DS_Store
 Thumbs.db
-.Spotlight-V100
-.Trashes
 
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Voice Agent models
-vosk-model-*
-
-# Temporary files
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.txt
-avito_*.png
-avito_*.txt
-
-# Selenium
-selenium_chrome/
-
 # Playwright
 .playwright/
 
-# Cloudflare
-cloudflared
-*.pem
-*.key
+# Node
+node_modules/
