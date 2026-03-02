@@ -34,13 +34,13 @@ async function loadVacancies() {
         // Загружаем вакансии из API
         // Для GitHub Pages + public API используйте публичный URL
         // Для локальной разработки: http://localhost:8000/vacancies
-        const API_URL = window.location.hostname === 'localhost' 
+        const apiUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:8000/vacancies'
             : 'https://recruit-test.loca.lt/vacancies';
         
-        console.log('Загрузка вакансий с:', API_URL);
+        console.log('Загрузка вакансий с:', apiUrl);
             
-        const response = await fetch(API_URL, {
+        const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -49,6 +49,9 @@ async function loadVacancies() {
         });
         
         if (!response.ok) {
+            if (response.status === 511) {
+                throw new Error('Loca.lt требует аутентификации. Откройте https://recruit-test.loca.lt в браузере для доступа');
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
@@ -59,9 +62,7 @@ async function loadVacancies() {
         renderVacancies();
     } catch (error) {
         console.error('Ошибка загрузки вакансий:', error);
-        console.error('URL:', API_URL);
-        console.error('Response status:', error.status);
-        tg.showAlert('Ошибка загрузки вакансий: ' + error.message + '. Проверьте консоль (F12)');
+        tg.showAlert('Ошибка: ' + error.message + '. Для работы нужен публичный API без captcha (Render/VPS)');
     }
 }
 
