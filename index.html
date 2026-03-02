@@ -6,56 +6,104 @@
     <title>Рекрутинг - Вакансии</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="animated-bg"></div>
     <div class="container py-3">
         <!-- Главная страница - список вакансий -->
         <div id="vacancies-page">
-            <h2 class="mb-4 text-center">💼 Доступные вакансии</h2>
+            <h2 class="mb-4 text-center title-gradient">💼 Доступные вакансии</h2>
             <div id="vacancies-list" class="vacancies-list"></div>
         </div>
 
-        <!-- Страница отклика -->
-        <div id="apply-page" style="display: none;">
-            <h2 class="mb-4 text-center">📝 Отклик на вакансию</h2>
-            <form id="apply-form">
-                <input type="hidden" id="vacancy-id" name="vacancy_id">
-                
-                <div class="mb-3">
-                    <label class="form-label">👤 Ваше имя</label>
-                    <input type="text" class="form-control" id="name" required>
+        <!-- Страница квалификации -->
+        <div id="qualification-page" style="display: none;">
+            <div class="qualification-card">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="step-indicator">
+                    <span id="step-current">1</span> / <span id="step-total">5</span>
                 </div>
                 
-                <div class="mb-3">
-                    <label class="form-label">📞 Телефон</label>
-                    <input type="tel" class="form-control" id="phone" required>
+                <!-- Шаг 1: Имя -->
+                <div class="qualification-step" id="step-1">
+                    <div class="step-icon">👤</div>
+                    <h3 class="step-title">Как вас зовут?</h3>
+                    <input type="text" class="qual-input" id="qual-name" placeholder="Введите ваше имя">
+                    <button class="btn-next" onclick="nextStep(1)">Далее →</button>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">💼 Опыт работы</label>
-                    <textarea class="form-control" id="experience" rows="3" placeholder="Расскажите о своём опыте..."></textarea>
+
+                <!-- Шаг 2: Телефон -->
+                <div class="qualification-step" id="step-2" style="display: none;">
+                    <div class="step-icon">📞</div>
+                    <h3 class="step-title">Ваш телефон</h3>
+                    <input type="tel" class="qual-input" id="qual-phone" placeholder="+7 (___) ___-__-__">
+                    <button class="btn-next" onclick="nextStep(2)">Далее →</button>
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">📄 Ссылка на резюме (необязательно)</label>
-                    <input type="url" class="form-control" id="resume_link" placeholder="https://...">
+
+                <!-- Шаг 3: Опыт -->
+                <div class="qualification-step" id="step-3" style="display: none;">
+                    <div class="step-icon">💼</div>
+                    <h3 class="step-title">Ваш опыт работы</h3>
+                    <textarea class="qual-input qual-textarea" id="qual-experience" placeholder="Расскажите о своём опыте..."></textarea>
+                    <div class="btn-row">
+                        <button class="btn-prev" onclick="prevStep(3)">← Назад</button>
+                        <button class="btn-next" onclick="nextStep(3)">Далее →</button>
+                    </div>
                 </div>
-                
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">✅ Отправить отклик</button>
-                    <button type="button" class="btn btn-secondary" onclick="showVacancies()">← Назад к вакансиям</button>
+
+                <!-- Шаг 4: График -->
+                <div class="qualification-step" id="step-4" style="display: none;">
+                    <div class="step-icon">📅</div>
+                    <h3 class="step-title">Желаемый график</h3>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectOption('schedule', 'full')">
+                            <span class="option-icon">🕐</span>
+                            <span>Полный день (5/2)</span>
+                        </div>
+                        <div class="option-card" onclick="selectOption('schedule', 'part')">
+                            <span class="option-icon">⏰</span>
+                            <span>Частичная занятость</span>
+                        </div>
+                        <div class="option-card" onclick="selectOption('schedule', 'remote')">
+                            <span class="option-icon">🏠</span>
+                            <span>Удалённо</span>
+                        </div>
+                        <div class="option-card" onclick="selectOption('schedule', 'flexible')">
+                            <span class="option-icon">📊</span>
+                            <span>Гибкий график</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="qual-schedule">
+                    <div class="btn-row">
+                        <button class="btn-prev" onclick="prevStep(4)">← Назад</button>
+                        <button class="btn-next" onclick="nextStep(4)">Далее →</button>
+                    </div>
                 </div>
-            </form>
+
+                <!-- Шаг 5: Зарплата -->
+                <div class="qualification-step" id="step-5" style="display: none;">
+                    <div class="step-icon">💰</div>
+                    <h3 class="step-title">Желаемая зарплата</h3>
+                    <input type="number" class="qual-input" id="qual-salary" placeholder="50000">
+                    <div class="btn-row">
+                        <button class="btn-prev" onclick="prevStep(5)">← Назад</button>
+                        <button class="btn-submit" onclick="submitApplication()">✅ Отправить</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Страница подтверждения -->
         <div id="success-page" style="display: none;">
-            <div class="text-center py-5">
-                <div class="display-1">✅</div>
-                <h3 class="mt-3">Отклик отправлен!</h3>
-                <p class="text-muted">Мы свяжемся с вами в ближайшее время</p>
-                <button class="btn btn-primary mt-3" onclick="showVacancies()">← К вакансиям</button>
+            <div class="success-card">
+                <div class="success-icon">✅</div>
+                <h3 class="success-title">Отклик отправлен!</h3>
+                <p class="success-text">Мы свяжемся с вами в ближайшее время</p>
+                <button class="btn-primary-custom" onclick="showVacancies()">← К вакансиям</button>
             </div>
         </div>
     </div>
