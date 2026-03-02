@@ -11,13 +11,35 @@
     --gradient-end: #f093fb;
 }
 
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 body {
     background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
-    min-height: 100vh;
     color: var(--tg-theme-text-color);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     position: relative;
-    overflow-x: hidden;
+}
+
+/* Адаптивный контейнер */
+.container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        padding: 10px;
+    }
 }
 
 .animated-bg {
@@ -40,17 +62,22 @@ body {
 }
 
 .vacancy-card {
-    background: var(--tg-theme-bg-color);
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
+    display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
 .vacancy-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
 .vacancy-title {
@@ -58,29 +85,48 @@ body {
     font-weight: 600;
     margin-bottom: 8px;
     color: var(--tg-theme-text-color);
+    display: block;
 }
 
 .vacancy-salary {
-    color: var(--tg-theme-link-color);
+    color: #667eea;
     font-weight: 500;
     margin-bottom: 8px;
+    display: block;
 }
 
 .vacancy-description {
     color: var(--tg-theme-text-color);
-    opacity: 0.8;
     font-size: 14px;
     line-height: 1.5;
+    display: block;
+}
+
+/* Контейнер для вакансий */
+.vacancies-list {
+    display: block;
+    width: 100%;
+    min-height: 200px;
 }
 
 .btn-primary {
-    background-color: var(--tg-theme-button-color);
-    border-color: var(--tg-theme-button-color);
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    border: none !important;
+    color: white !important;
+    display: inline-block;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn-primary:hover {
-    background-color: var(--tg-theme-button-color);
-    opacity: 0.9;
+    background: linear-gradient(135deg, #5a6fd6, #6a4190) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .form-control, .form-control:focus {
