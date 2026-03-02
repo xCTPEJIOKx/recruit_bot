@@ -267,7 +267,8 @@ async function submitApplication() {
     try {
         // Отправка данных на API
         // Для GitHub Pages нужен публичный API URL
-        const API_URL = 'http://localhost:8000/candidates'; // Замените на ваш публичный URL
+        // Используйте ngrok: ngrok http 8000
+        const API_URL = 'http://localhost:8000/candidates'; // Замените на https://xxx.ngrok.io/candidates
         
         const response = await fetch(API_URL, {
             method: 'POST',
