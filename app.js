@@ -34,9 +34,11 @@ async function loadVacancies() {
         // Загружаем вакансии из API
         // Для GitHub Pages + public API используйте публичный URL
         // Для локальной разработки: http://localhost:8000/vacancies
+        // CORS proxy для обхода ограничений
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
         const apiUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:8000/vacancies'
-            : 'https://recruit-test.loca.lt/vacancies';
+            : CORS_PROXY + encodeURIComponent('https://recruit-test.loca.lt/vacancies');
         
         console.log('Загрузка вакансий с:', apiUrl);
             
