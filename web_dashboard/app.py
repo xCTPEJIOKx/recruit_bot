@@ -275,9 +275,9 @@ async def api_create_candidate(candidate_data: CandidateForm):
         vacancy_id=candidate_data.vacancy_id,
         notes=candidate_data.notes or "",
     )
-    
+
     await db.create_candidate(candidate)
-    
+
     # Создаём задачу на звонок
     task = Task(
         agent_type=AgentType.VOICE,
@@ -290,8 +290,61 @@ async def api_create_candidate(candidate_data: CandidateForm):
         priority=1
     )
     await db.create_task(task)
-    
+
+    # Отправляем уведомление в Telegram
+    await send_telegram_notification(candidate)
+
     return {"id": candidate.id, "status": "created"}
+
+
+async def send_telegram_notification(candidate):
+    """Отправка уведомления в Telegram бот"""
+    try:
+        from common import settings
+        import aiohttp
+        
+        bot_token = settings.telegram_bot_token
+        admin_chat_id = settings.telegram_admin_chat_id
+        
+        if not bot_token:
+            return
+        
+        # Если admin_chat_id не задан, пробуем получить его
+        if not admin_chat_id:
+            # Отправляем в бота - уведомления придут в бота
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            async with aiohttp.ClientSession() as session:
+                await session.post(url, json={
+                    "chat_id": bot_token.split(':')[0],
+                    "text": "⚠️ Настройте TELEGRAM_ADMIN_CHAT_ID в .env для получения уведомлений",
+                    "parse_mode": "HTML"
+                })
+            return
+        
+        # Формируем сообщение
+        message = f"""
+🔔 <b>Новый отклик!</b>
+
+👤 <b>Имя:</b> {candidate.name}
+📞 <b>Телефон:</b> {candidate.phone}
+📋 <b>Источник:</b> {candidate.source}
+📝 <b>Вакансия:</b> {candidate.vacancy_id[:30] + '...' if candidate.vacancy_id and len(candidate.vacancy_id) > 30 else candidate.vacancy_id or 'Не указана'}
+
+🕐 <b>Время:</b> {candidate.created_at.strftime('%d.%m.%Y %H:%M')}
+"""
+        
+        # Отправляем через Telegram API
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        
+        async with aiohttp.ClientSession() as session:
+            await session.post(url, json={
+                "chat_id": admin_chat_id,
+                "text": message,
+                "parse_mode": "HTML"
+            })
+            
+    except Exception as e:
+        print(f"Ошибка отправки в Telegram: {e}")
 
 
 @app.put("/api/candidates/{candidate_id}/status")

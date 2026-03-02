@@ -10,6 +10,7 @@ from typing import Optional
 class Settings(BaseSettings):
     # Telegram
     telegram_bot_token: str = ""
+    telegram_admin_chat_id: Optional[str] = None  # Chat ID для уведомлений
 
     # Avito (для браузерной автоматизации)
     avito_login: str = ""  # Логин от Avito (телефон или email)
