@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment
+.env
+.env.local
+
+# Database
+*.db
+*.db-journal
+data/*.db
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+
+# Git
+.git/
+.gitignore
+
+# Docs
+docs/
+*.md
+
+# Scripts
+scripts/
+deploy.sh
+run.sh
+start.sh
+install.sh
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Render
+render.yaml
