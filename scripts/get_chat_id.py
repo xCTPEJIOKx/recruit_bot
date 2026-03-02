@@ -5,8 +5,11 @@
 """
 import requests
 import sys
+import os
 
-# Читаем токен из .env
+# Добавляем проект в path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from common import settings
 
 if not settings.telegram_bot_token:
