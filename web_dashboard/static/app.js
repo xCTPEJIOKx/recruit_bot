@@ -31,8 +31,13 @@ async function loadVacancies() {
     showLoading();
 
     try {
-        // Загружаем вакансии из API через localtunnel
-        const API_URL = 'https://tiny-toys-tickle.loca.lt/api/vacancies';
+        // Загружаем вакансии из API
+        // Для GitHub Pages + public API используйте: https://your-url.com/api/vacancies
+        // Для локальной разработки: /api/vacancies (через proxy) или http://localhost:8080/api/vacancies
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8080/api/vacancies'
+            : '/api/vacancies';
+            
         const response = await fetch(API_URL);
         const data = await response.json();
         vacancies = data.vacancies || [];
@@ -246,8 +251,9 @@ async function submitApplication() {
 
     try {
         // Отправка данных на API
-        // Публичный API через localtunnel
-        const API_URL = 'https://tiny-toys-tickle.loca.lt/api/candidates';
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8080/api/candidates'
+            : '/api/candidates';
         
         const response = await fetch(API_URL, {
             method: 'POST',
