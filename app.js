@@ -245,13 +245,8 @@ async function submitApplication() {
 
     try {
         // Отправка данных на API
-        // Автоматическое определение URL в зависимости от окружения
-        let API_URL = '/api/candidates'; // Относительный URL (работает с GitHub Pages + ngrok/proxy)
-        
-        // Если открыто локально - используем localhost
-        if (window.location.hostname === 'localhost') {
-            API_URL = 'http://localhost:8080/api/candidates';
-        }
+        // Публичный API через localtunnel
+        const API_URL = 'https://tiny-toys-tickle.loca.lt/api/candidates';
         
         const response = await fetch(API_URL, {
             method: 'POST',
