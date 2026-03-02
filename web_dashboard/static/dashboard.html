@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Recruitment System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Навигация -->
+    <nav class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold">🤖 Recruitment Dashboard</h1>
+                <div class="flex space-x-4">
+                    <a href="/static/index.html" class="px-4 py-2 rounded-lg hover:bg-white/20 transition">🌐 Web App</a>
+                    <a href="/candidates" class="px-4 py-2 rounded-lg hover:bg-white/20 transition">👥 Кандидаты</a>
+                    <a href="/vacancies" class="px-4 py-2 rounded-lg hover:bg-white/20 transition">💼 Вакансии</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Контент -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Статистика -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Кандидаты -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Всего кандидатов</p>
+                        <p id="total-candidates" class="text-4xl font-bold text-blue-600">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-users text-blue-500 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вакансии -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Активные вакансии</p>
+                        <p id="active-vacancies" class="text-4xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-briefcase text-green-500 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Агенты онлайн -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Агенты онлайн</p>
+                        <p id="alive-agents" class="text-4xl font-bold text-purple-600">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-purple-500 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Взаимодействия -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Взаимодействий</p>
+                        <p id="total-interactions" class="text-4xl font-bold text-orange-600">0</p>
+                    </div>
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-comments text-orange-500 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Воронка и график -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Воронка -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">📊 Воронка рекрутинга</h2>
+                <div id="funnel" class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <span>🆕 Новые</span>
+                        <span id="funnel-new" class="font-bold text-blue-600">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <span>📞 Связались</span>
+                        <span id="funnel-contacted" class="font-bold text-yellow-600">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <span>✅ Квалифицированы</span>
+                        <span id="funnel-qualified" class="font-bold text-green-600">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                        <span>📅 Собеседования</span>
+                        <span id="funnel-interview" class="font-bold text-purple-600">0</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                        <span>🎉 Приняты</span>
+                        <span id="funnel-hired" class="font-bold text-emerald-600">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- График -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">📈 Статусы кандидатов</h2>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Последние кандидаты -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">👥 Последние кандидаты</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Имя</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Телефон</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Статус</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Источник</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidates-table" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Загрузка данных
+        async function loadDashboard() {
+            try {
+                // Статистика
+                const statsRes = await fetch('/stats');
+                const stats = await statsRes.json();
+                
+                document.getElementById('total-candidates').textContent = stats.total_candidates || 0;
+                document.getElementById('active-vacancies').textContent = stats.active_vacancies || 0;
+                document.getElementById('alive-agents').textContent = stats.alive_agents || 0;
+                document.getElementById('total-interactions').textContent = stats.total_interactions || 0;
+
+                // Воронка
+                const funnel = stats.funnel || {};
+                document.getElementById('funnel-new').textContent = funnel.new || 0;
+                document.getElementById('funnel-contacted').textContent = funnel.contacted || 0;
+                document.getElementById('funnel-qualified').textContent = funnel.qualified || 0;
+                document.getElementById('funnel-interview').textContent = funnel.interview || 0;
+                document.getElementById('funnel-hired').textContent = funnel.hired || 0;
+
+                // График
+                const ctx = document.getElementById('statusChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Новые', 'Связались', 'Квалифицированы', 'Собеседования', 'Приняты'],
+                        datasets: [{
+                            data: [
+                                funnel.new || 0,
+                                funnel.contacted || 0,
+                                funnel.qualified || 0,
+                                funnel.interview || 0,
+                                funnel.hired || 0
+                            ],
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#eab308',
+                                '#22c55e',
+                                '#a855f7',
+                                '#10b981'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+
+                // Кандидаты
+                const candidatesRes = await fetch('/candidates?limit=10');
+                const candidatesData = await candidatesRes.json();
+                const candidates = candidatesData.candidates || [];
+                
+                const tbody = document.getElementById('candidates-table');
+                const statusEmojis = {
+                    'new': '🆕',
+                    'contacted': '📞',
+                    'qualified': '✅',
+                    'interview': '📅',
+                    'hired': '🎉',
+                    'rejected': '❌'
+                };
+                
+                tbody.innerHTML = candidates.map(c => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium">${c.name || 'Не указано'}</td>
+                        <td class="px-6 py-4 font-mono text-sm">${c.phone || '—'}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-gray-100 rounded-full text-sm">
+                                ${statusEmojis[c.status] || '❓'} ${c.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">${c.source || '—'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            ${new Date(c.created_at).toLocaleDateString('ru-RU')}
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

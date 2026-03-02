@@ -88,7 +88,14 @@ class Orchestrator:
             """Статистика системы"""
             stats = await db.get_stats()
             return stats
-        
+
+        @self.app.get("/dashboard")
+        async def dashboard():
+            """Графическая панель управления"""
+            return FileResponse(
+                Path(__file__).parent.parent / "web_dashboard" / "static" / "dashboard.html"
+            )
+
         @self.app.get("/candidates")
         async def get_candidates(limit: int = 100, status: Optional[str] = None):
             """Список кандидатов"""
