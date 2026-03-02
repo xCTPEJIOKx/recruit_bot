@@ -295,15 +295,25 @@ async def api_create_candidate(candidate_data: CandidateForm):
 
 
 @app.put("/api/candidates/{candidate_id}/status")
-async def api_update_candidate_status(candidate_id: str, new_status: str):
+async def api_update_candidate_status(candidate_id: str, request: Request, new_status: str = None):
     """API: Обновление статуса кандидата"""
+    from pydantic import BaseModel
+    
+    # Пробуем получить new_status из body или query
+    if new_status is None:
+        try:
+            body = await request.json()
+            new_status = body.get('new_status')
+        except:
+            raise HTTPException(status_code=400, detail="new_status required")
+    
     try:
         status = CandidateStatus(new_status)
     except ValueError:
         raise HTTPException(status_code=400, detail=f"Invalid status: {new_status}")
-    
+
     await db.update_candidate_status(candidate_id, status)
-    
+
     return {"status": "updated"}
 
 
