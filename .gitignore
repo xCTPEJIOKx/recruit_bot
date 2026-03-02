@@ -19,6 +19,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.pyc
 
 # Virtual environments
 venv/
@@ -36,19 +37,24 @@ ENV/
 # Environment
 .env
 .env.local
+.env.*.local
 
 # Database
 *.db
 *.db-journal
-data/
+data/*.db
+data/*.db-journal
 
 # Logs
 *.log
 logs/
+/tmp/
 
 # OS
 .DS_Store
 Thumbs.db
+.Spotlight-V100
+.Trashes
 
 # Testing
 .pytest_cache/
@@ -59,22 +65,21 @@ htmlcov/
 vosk-model-*
 
 # Temporary files
-*.log
 *.png
 *.jpg
+*.jpeg
+*.gif
 *.txt
-/tmp/
 avito_*.png
 avito_*.txt
 
-# Virtual environments
-venv/
-env/
-.venv/
+# Selenium
 selenium_chrome/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Playwright
+.playwright/
+
+# Cloudflare
+cloudflared
+*.pem
+*.key

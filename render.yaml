@@ -1,0 +1,82 @@
+services:
+  # Orchestrator API
+  - type: web
+    name: recruit-orchestrator
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m orchestrator.orchestrator
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/recruitment.db
+      - key: ORCHESTRATOR_HOST
+        value: 0.0.0.0
+      - key: ORCHESTRATOR_PORT
+        value: $PORT
+      - key: LOG_LEVEL
+        value: INFO
+    disk:
+      name: recruit-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+
+  # Telegram Bot
+  - type: web
+    name: recruit-telegram-bot
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m telegram_bot.bot
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/recruitment.db
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
+
+  # Avito Agent
+  - type: worker
+    name: recruit-avito-agent
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt && playwright install chromium
+    startCommand: python -m avito_agent.avito_browser_agent
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/recruitment.db
+      - key: AVITO_LOGIN
+        sync: false
+      - key: AVITO_PASSWORD
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
+
+  # Voice Agent
+  - type: worker
+    name: recruit-voice-agent
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m voice_agent.voice_agent
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/recruitment.db
+      - key: VOXIMPLANT_ACCOUNT_ID
+        sync: false
+      - key: VOXIMPLANT_API_KEY
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO
