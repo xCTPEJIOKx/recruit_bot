@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Orchestrator API
+  orchestrator:
+    build: .
+    command: python -m orchestrator.orchestrator
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_PATH=/app/data/recruitment.db
+      - ORCHESTRATOR_HOST=0.0.0.0
+      - ORCHESTRATOR_PORT=8000
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - recruitment-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Telegram Bot
+  telegram_bot:
+    build: .
+    command: python -m telegram_bot.bot
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_PATH=/app/data/recruitment.db
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - recruitment-network
+    depends_on:
+      - orchestrator
+
+  # Avito Agent
+  avito_agent:
+    build: .
+    command: python -m avito_agent.agent
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_PATH=/app/data/recruitment.db
+      - AVITO_CLIENT_ID=${AVITO_CLIENT_ID:-}
+      - AVITO_CLIENT_SECRET=${AVITO_CLIENT_SECRET:-}
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - recruitment-network
+    depends_on:
+      - orchestrator
+
+  # Voice Agent
+  voice_agent:
+    build: .
+    command: python -m voice_agent.voice_agent
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_PATH=/app/data/recruitment.db
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    networks:
+      - recruitment-network
+    depends_on:
+      - orchestrator
+
+networks:
+  recruitment-network:
+    driver: bridge
+
+volumes:
+  data:

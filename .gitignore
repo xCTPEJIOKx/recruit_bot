@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# Database
+*.db
+*.db-journal
+data/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Voice Agent models
+vosk-model-*
+
+# Temporary files
+*.log
+*.png
+*.jpg
+*.txt
+/tmp/
+avito_*.png
+avito_*.txt
+
+# Virtual environments
+venv/
+env/
+.venv/
+selenium_chrome/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

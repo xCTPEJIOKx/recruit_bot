@@ -331,32 +331,63 @@ function showVacancies() {
 document.addEventListener('DOMContentLoaded', function() {
     const phoneInput = document.getElementById('qual-phone');
     
-    phoneInput?.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 0) {
-            if (value[0] === '7' || value[0] === '8') {
-                value = value.substring(1);
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Удаляем всё кроме цифр
+            if (value.length === 0) {
+                e.target.value = '';
+                return;
             }
-            value = '7' + value;
-        }
-        if (value.length > 11) value = value.substring(0, 11);
+            
+            // Если начинается с 8, заменяем на 7
+            if (value[0] === '8') {
+                value = '7' + value.substring(1);
+            }
+            // Если не начинается с 7, добавляем 7
+            if (value[0] !== '7') {
+                value = '7' + value;
+            }
+            
+            // Ограничиваем 11 цифрами
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            
+            // Форматируем: +7 (XXX) XXX-XX-XX
+            let formatted = '+7';
+            if (value.length > 1) {
+                formatted += ' (' + value.substring(1, 4);
+            }
+            if (value.length >= 5) {
+                formatted += ') ' + value.substring(4, 7);
+            }
+            if (value.length >= 8) {
+                formatted += '-' + value.substring(7, 9);
+            }
+            if (value.length >= 10) {
+                formatted += '-' + value.substring(9, 11);
+            }
+            
+            e.target.value = formatted;
+        });
         
-        let formatted = '+' + value;
-        if (value.length > 1) {
-            formatted = formatted.substring(0, 2) + ' (' + formatted.substring(2, 5);
-        }
-        if (value.length >= 5) {
-            formatted = formatted + ') ' + formatted.substring(7, 10);
-        }
-        if (value.length >= 8) {
-            formatted = formatted + '-' + formatted.substring(10, 12);
-        }
-        if (value.length >= 10) {
-            formatted = formatted + '-' + formatted.substring(12, 14);
-        }
+        // Обработка удаления (backspace)
+        phoneInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && e.target.value === '+7 ') {
+                e.target.value = '';
+            }
+        });
         
-        e.target.value = formatted;
-    });
+        // При потере фокуса проверяем длину
+        phoneInput.addEventListener('blur', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length < 11) {
+                e.target.value = '';
+            }
+        });
+    }
 });
 
 // Загрузка вакансий при старте
