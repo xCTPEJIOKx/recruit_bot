@@ -31,31 +31,10 @@ async function loadVacancies() {
     showLoading();
 
     try {
-        // В реальности: fetch('/api/vacancies')
-        // Для примера - моковые данные
-        vacancies = [
-            {
-                id: 1,
-                title: "Менеджер по продажам",
-                salary_min: 50000,
-                salary_max: 100000,
-                description: "Ищем активного менеджера по продажам. Опыт работы от 1 года. Удалённая работа."
-            },
-            {
-                id: 2,
-                title: "Оператор колл-центра",
-                salary_min: 40000,
-                salary_max: 60000,
-                description: "Приём входящих звонков, консультация клиентов. Обучение предоставляется."
-            },
-            {
-                id: 3,
-                title: "Помощник руководителя",
-                salary_min: 60000,
-                salary_max: 80000,
-                description: "Организационная поддержка, ведение документации. Офис в центре."
-            }
-        ];
+        // Загружаем вакансии из API Web Dashboard
+        const response = await fetch('/api/vacancies');
+        const data = await response.json();
+        vacancies = data.vacancies || [];
 
         renderVacancies();
     } catch (error) {
@@ -388,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Загрузка вакансий после загрузки DOM
+    loadVacancies();
 });
-
-// Загрузка вакансий при старте
-loadVacancies();

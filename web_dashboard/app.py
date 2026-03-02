@@ -306,11 +306,17 @@ async def send_telegram_notification(candidate):
         bot_token = settings.telegram_bot_token
         admin_chat_id = settings.telegram_admin_chat_id
         
+        print(f"🔔 Отправка уведомления в Telegram...")
+        print(f"   Token: {bot_token[:20]}...")
+        print(f"   Chat ID: {admin_chat_id}")
+        
         if not bot_token:
+            print("   ❌ TELEGRAM_BOT_TOKEN не задан")
             return
         
         # Если admin_chat_id не задан, пробуем получить его
         if not admin_chat_id:
+            print("   ⚠️ TELEGRAM_ADMIN_CHAT_ID не задан")
             # Отправляем в бота - уведомления придут в бота
             url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
             async with aiohttp.ClientSession() as session:
@@ -337,14 +343,21 @@ async def send_telegram_notification(candidate):
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
         
         async with aiohttp.ClientSession() as session:
-            await session.post(url, json={
+            response = await session.post(url, json={
                 "chat_id": admin_chat_id,
                 "text": message,
                 "parse_mode": "HTML"
             })
+            result = await response.json()
+            print(f"   📡 Telegram API Response: {result}")
+            
+            if result.get('ok'):
+                print("   ✅ Уведомление отправлено успешно!")
+            else:
+                print(f"   ❌ Ошибка: {result.get('description', 'Unknown error')}")
             
     except Exception as e:
-        print(f"Ошибка отправки в Telegram: {e}")
+        print(f"   ❌ Ошибка отправки в Telegram: {e}")
 
 
 @app.put("/api/candidates/{candidate_id}/status")
